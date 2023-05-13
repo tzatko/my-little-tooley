@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# Convert video files to mp3 
+# Made in conversation with ChatGPT / GPT-4 on 2023-05-12 by tzatko
+# Prompt: Write a python script that gets all the video files in the directory and extracts audio from each of them by ffmpeg and saves it as mp3 files. Start from traversing recursively from the current directory and search for all possible movie formats. Implement an optional parameter -d that deletes the original video file if the conversion to mp3 was successful. Use import ffmpeg. 
+
+import os
+import argparse
+import subprocess
+
+def extract_audio(video_file, audio_file):
+    command = ['ffmpeg', '-i', video_file, '-q:a', '0', '-map', 'a', audio_file]
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    return result.returncode == 0  # True if successful, False otherwise
+
+def traverse_directory(directory, delete=False):
+    video_extensions = ['.mp4', '.avi', '.mkv', '.flv', '.mov', '.wmv']  # Add or remove video formats as needed
+
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            if any(filename.endswith(ext) for ext in video_extensions):
+                full_path = os.path.join(dirpath, filename)
+                audio_file = os.path.splitext(full_path)[0] + '.mp3'
+
+                if extract_audio(full_path, audio_file) and delete:
+                    os.remove(full_path)
+                    print(f'Deleted video file: {full_path}')
+                else:
+                    print(f'Audio extracted to: {audio_file}')
+
+def main():
+    parser = argparse.ArgumentParser(description='Extract audio from video files')
+    parser.add_argument('-d', '--delete', action='store_true', help='Delete original video files after conversion')
+
+    args = parser.parse_args()
+    traverse_directory(os.getcwd(), delete=args.delete)
+
+if __name__ == '__main__':
+    main()

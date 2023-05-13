@@ -1,0 +1,20 @@
+#!/bin/bash
+# Converts all WMA audio files in the current directory to MP3 format using FFmpeg + lame
+
+for file in *.wma
+do
+  # Extract the base name (without extension)
+  base="${file%%.*}"
+
+  # Convert the file to mp3
+  ffmpeg -i "$file" -acodec libmp3lame "$base.mp3"
+
+  # Check if the conversion was successful
+  if [ $? -eq 0 ]; then
+    # If the conversion was successful, delete the original file
+    rm "$file"
+  else
+    # If the conversion failed, print an error message
+    echo "Conversion failed for $file"
+  fi
+done

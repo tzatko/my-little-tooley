@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# nfn - Normalize File Name
+# Made in conversation with ChatGPT / GPT-4
+# 2023-05-12 tzatko
+#
+# dependences:
+# pip install unidecode
+#
+
+import os
+from unidecode import unidecode
+
+def sanitize_filename(filename):
+    # Convert to closest ASCII representation, remove leading/trailing spaces
+    filename = unidecode(filename).strip()
+
+    # Replace problematic characters and spaces with underscore
+    for char in r' <>:"/\|?*':
+        filename = filename.replace(char, '_')
+
+    # Trim the filename length to 200 characters, ensuring not to cut the file extension
+    name, ext = os.path.splitext(filename)
+    if len(filename) > 200:
+        name = name[:200-len(ext)]
+        filename = name + ext
+
+    return filename
+
+def normalize_filenames(root_dir):
+    for dirpath, dirnames, filenames in os.walk(root_dir, topdown=False):
+        for filename in filenames:
+            sanitized_filename = sanitize_filename(filename)
+            if filename != sanitized_filename:
+                os.rename(
+                    os.path.join(dirpath, filename),
+                    os.path.join(dirpath, sanitized_filename)
+                )
+
+        for dirname in dirnames:
+            sanitized_dirname = sanitize_filename(dirname)
+            if dirname != sanitized_dirname:
+                os.rename(
+                    os.path.join(dirpath, dirname),
+                    os.path.join(dirpath, sanitized_dirname)
+                )
+
+normalize_filenames('.')

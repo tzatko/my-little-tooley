@@ -1,0 +1,7 @@
+#!/bin/bash
+# Renames all files with the .part extension to remove this extension.
+# This is particularly useful for stream rips that were interrupted or unfinished,
+# as it allows these files to be recognized and processed as complete files.
+
+find . -name "*.part" -exec rename "s/.part//" {} \;
+

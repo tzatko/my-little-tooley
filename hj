@@ -1,0 +1,4 @@
+#!/bin/bash
+# converts all the HEIC files to jpeg files in the current directory.
+
+for F in `ls *HEIC`;do convert $F `basename $F .HEIC`.jpg && rm $F; done

@@ -1,0 +1,4 @@
+#!/bin/bash
+# https://askubuntu.com/questions/600286/total-video-time-in-a-directory
+
+find . -type f -exec avprobe -v quiet -show_format_entry duration "{}" \; | awk '{s+=$1} END {h=s/3600; s=s%3600; printf "%.2d:%.2d\n", int(h), int(s/60)}'
