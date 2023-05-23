@@ -3,7 +3,7 @@
 
 import os, fnmatch
 from pathlib import Path
-import ffmpeg
+import ffmpeg_python as ffmpeg
 
 def find_files(directory, pattern):
     for root, dirs, files in os.walk(directory):
@@ -15,19 +15,12 @@ def find_files(directory, pattern):
 
 for filename in find_files('.', '*.webm'):
     print('Found webm file:', filename)
-    newname = str(filename).replace('webm','mp4')    
+    newname = str(filename).replace('webm','mp4')
     print('Will be converted to:', newname)
     try:
         stream = ffmpeg.input(filename)
         stream = ffmpeg.output(stream, newname)
         ffmpeg.run(stream)
         os.remove(filename)
-    except:
-        print("Something else went wrong")
-
-
-
-    
-
-
-
+    except Exception as e:
+        print("An error occurred during the conversion: ", str(e))
