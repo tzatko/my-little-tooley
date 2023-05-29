@@ -1,26 +1,16 @@
-#!/usr/bin/env python3
+#!/bin/bash
 # Finds and converts all webm files in the current directory to mp4 format using ffmpeg.
 
-import os, fnmatch
-from pathlib import Path
-import ffmpeg_python as ffmpeg
-
-def find_files(directory, pattern):
-    for root, dirs, files in os.walk(directory):
-        for basename in files:
-            if fnmatch.fnmatch(basename, pattern):
-                filename = os.path.join(root, basename)
-                yield filename
-
-
-for filename in find_files('.', '*.webm'):
-    print('Found webm file:', filename)
-    newname = str(filename).replace('webm','mp4')
-    print('Will be converted to:', newname)
-    try:
-        stream = ffmpeg.input(filename)
-        stream = ffmpeg.output(stream, newname)
-        ffmpeg.run(stream)
-        os.remove(filename)
-    except Exception as e:
-        print("An error occurred during the conversion: ", str(e))
+for filename in $(find . -type f -name "*.webm")
+do
+    echo "Found webm file: $filename"
+    newname=$(echo "$filename" | sed 's/.webm/.mp4/')
+    echo "Will be converted to: $newname"
+    ffmpeg -i "$filename" "$newname"
+    if [ $? -eq 0 ]; then
+        echo "Successfully converted $filename to $newname."
+        rm "$filename"
+    else
+        echo "An error occurred during the conversion of $filename."
+    fi
+done
