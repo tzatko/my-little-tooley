@@ -8,6 +8,7 @@
 #
 
 import os
+import argparse
 from unidecode import unidecode
 
 def sanitize_filename(filename):
@@ -26,22 +27,37 @@ def sanitize_filename(filename):
 
     return filename
 
-def normalize_filenames(root_dir):
+def reverse_sanitize_filename(filename):
+    # Convert underscores to spaces
+    return filename.replace('_', ' ')
+
+def normalize_filenames(root_dir, reverse=False):
     for dirpath, dirnames, filenames in os.walk(root_dir, topdown=False):
         for filename in filenames:
-            sanitized_filename = sanitize_filename(filename)
-            if filename != sanitized_filename:
+            if reverse:
+                new_filename = reverse_sanitize_filename(filename)
+            else:
+                new_filename = sanitize_filename(filename)
+            if filename != new_filename:
                 os.rename(
                     os.path.join(dirpath, filename),
-                    os.path.join(dirpath, sanitized_filename)
+                    os.path.join(dirpath, new_filename)
                 )
 
         for dirname in dirnames:
-            sanitized_dirname = sanitize_filename(dirname)
-            if dirname != sanitized_dirname:
+            if reverse:
+                new_dirname = reverse_sanitize_filename(dirname)
+            else:
+                new_dirname = sanitize_filename(dirname)
+            if dirname != new_dirname:
                 os.rename(
                     os.path.join(dirpath, dirname),
-                    os.path.join(dirpath, sanitized_dirname)
+                    os.path.join(dirpath, new_dirname)
                 )
 
-normalize_filenames('.')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Normalize or reverse normalize filenames")
+    parser.add_argument("-r", "--reverse", action="store_true", help="Reverse the renaming by changing underscores to spaces")
+    args = parser.parse_args()
+
+    normalize_filenames('.', reverse=args.reverse)
