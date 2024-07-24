@@ -32,3 +32,7 @@ Converts WEBM video files to MP4 format.
 
 ## wma2mp3
 Converts WMA audio files to MP3 format.
+
+## pgw
+Automatically detects the default gateway and pings it.
+It uses the 'gping' tool if available, otherwise falls back to the standard 'ping' command.
