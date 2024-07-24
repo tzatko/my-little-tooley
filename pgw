@@ -21,10 +21,9 @@ def ping_gateway(gateway):
         cmd = ["gping", gateway]
     else:
         if platform.system() == "Windows":
-            cmd = ["ping", "-n", "4", gateway]
+            cmd = ["ping", "-t", gateway]
         else:
-            cmd = ["ping", "-c", "4", gateway]
-    
+            cmd = ["ping", gateway]    
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
