@@ -5,34 +5,46 @@ pgw (Ping Gateway)
 
 This script automatically detects the default gateway of the system and pings it.
 It uses the 'gping' tool if available, otherwise falls back to the standard 'ping' command.
+It supports both IPv4 and IPv6 based on the script's name.
 """
 
 import subprocess
 import platform
 import shutil
 import netifaces
+import os
 
-def get_default_gateway():
+def get_default_gateway(family):
     gateways = netifaces.gateways()
-    return gateways['default'][netifaces.AF_INET][0]
+    return gateways['default'][family][0]
 
-def ping_gateway(gateway):
+def ping_gateway(gateway, family):
     if shutil.which("gping"):
         cmd = ["gping", gateway]
     else:
         if platform.system() == "Windows":
-            cmd = ["ping", "-t", gateway]
+            cmd = ["ping", "-t", gateway] if family == netifaces.AF_INET else ["ping", "-6", "-t", gateway]
         else:
-            cmd = ["ping", gateway]    
+            cmd = ["ping", gateway] if family == netifaces.AF_INET else ["ping", "-6", gateway]
+    
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
         print(f"Failed to ping {gateway}")
 
 if __name__ == "__main__":
+    script_name = os.path.basename(__file__)
+    if script_name == "pgw6":
+        family = netifaces.AF_INET6
+    else:
+        family = netifaces.AF_INET
+    
     try:
-        gateway = get_default_gateway()
+        gateway = get_default_gateway(family)
         print(f"Default gateway: {gateway}")
-        ping_gateway(gateway)
+        ping_gateway(gateway, family)
+    except KeyError:
+        print(f"No default gateway found for {'IPv6' if family == netifaces.AF_INET6 else 'IPv4'}")
     except Exception as e:
         print(f"An error occurred: {e}")
+

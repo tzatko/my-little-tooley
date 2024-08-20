@@ -34,5 +34,16 @@ Converts WEBM video files to MP4 format.
 Converts WMA audio files to MP3 format.
 
 ## pgw
-Automatically detects the default gateway and pings it.
+Automatically detects the default gateway (IPv4 or IPv6) and pings it.
 It uses the 'gping' tool if available, otherwise falls back to the standard 'ping' command.
+
+### Usage
+
+- **IPv4 Gateway**: Run the script as `pgw` to ping the default IPv4 gateway.
+- **IPv6 Gateway**: Create a symlink named `pgw6` and run it to ping the default IPv6 gateway.
+
+#### Create the Symlink for IPv6
+
+```bash
+ln -s pgw pgw6
+
